@@ -1,7 +1,8 @@
 package com.example.movieapp.data.sources.remote
 
 import com.example.movieapp.data.models.Movie
+import com.example.movieapp.data.models.MovieResponse
 
 interface RemoteDataSource {
-    suspend fun getMovies(): List<Movie>
+    suspend fun getMovies(): MovieResponse
 }

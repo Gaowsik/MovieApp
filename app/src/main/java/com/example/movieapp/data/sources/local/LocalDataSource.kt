@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
     fun getMovies(): List<Movie>
-    fun getMovieById(planetId: String): Movie
+    fun getMovieById(planetId: Int): Movie
     suspend fun setPlanets(planets: List<Movie>)
     suspend fun addFavouriteById(id: Int) : Int
 }

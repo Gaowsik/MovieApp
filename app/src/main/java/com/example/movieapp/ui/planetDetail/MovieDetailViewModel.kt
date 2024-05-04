@@ -31,7 +31,7 @@ class MovieDetailViewModel @Inject constructor(
 
 
     fun getMovies(
-        id: String
+        id: Int
     ) = viewModelScope.launch {
         movieDetailLiveData.setLoading()
         try {

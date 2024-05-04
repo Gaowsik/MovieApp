@@ -15,11 +15,11 @@ class MovieRepositoryImpl @Inject constructor(
     override fun getMovies(): List<Movie> = localDataSource.getMovies()
 
 
-    override fun getMovieById(movieId: String): Movie =
+    override fun getMovieById(movieId: Int): Movie =
         localDataSource.getMovieById(movieId)
 
     override suspend fun refreshMovies() {
-        val movies = remoteDataSource.getMovies()
+        val movies = remoteDataSource.getMovies().results
         localDataSource.setPlanets(movies)
     }
 

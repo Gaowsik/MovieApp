@@ -52,5 +52,12 @@ class MovieListViewModel @Inject constructor(
         if (updateTaxiStatusResult != 1) throw IllegalStateException("Failed to On Local!")
     }
 
+    fun refreshMoviesList() {
+        viewModelScope.launch {
+                movieRepository.refreshMovies()
+
+        }
+    }
+
 
 }

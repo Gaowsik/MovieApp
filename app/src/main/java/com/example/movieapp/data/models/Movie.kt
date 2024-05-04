@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Movie(
     @field:SerializedName("trackId")
-    val trackId: Long,
+    val trackId: Int,
 
     @field:SerializedName("trackName")
     val trackName: String,
@@ -21,4 +21,6 @@ data class Movie(
     @field:SerializedName("longDescription")
     val longDescription: String,
 
-    )
+    val isFavourite: Boolean = false
+
+)
