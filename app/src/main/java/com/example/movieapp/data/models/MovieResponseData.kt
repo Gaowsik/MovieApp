@@ -1,6 +1,6 @@
 package com.example.movieapp.data.models
 
-import com.example.movieapp.domain.Movie
+import com.example.movieapp.domain.model.Movie
 import com.google.gson.annotations.SerializedName
 
 data class MovieResponseData(
@@ -34,6 +34,5 @@ data class MovieResponseData(
             isFavourite = false
         )
     }
-
 
 }

@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 class AddFavouriteUseCase @Inject constructor(private val movieRepository: MovieRepository) {
     suspend operator fun invoke(id: Int) : Int {
-        if (id!=0) {
+        if (id==0) {
             throw Exception("Id is Empty")
         }
         return movieRepository.addFavouriteById(id)

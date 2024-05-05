@@ -3,7 +3,7 @@ package com.example.movieapp.ui.planetList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieapp.domain.Movie
+import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.data.repository.MovieRepository
 import com.example.movieapp.data.utills.state_models.Resource
 import com.example.movieapp.data.utills.state_models.setErrorString
@@ -49,9 +49,9 @@ class MovieListViewModel @Inject constructor(
         if (updateTaxiStatusResult != 1) throw IllegalStateException("Failed to On Local!")
     }
 
-    fun refreshMoviesList() {
+    fun refreshMoviesList(term: String, country: String, media: String) {
         viewModelScope.launch {
-                movieRepository.refreshMovies()
+            movieRepository.refreshMovies(term, country, media)
 
         }
     }
