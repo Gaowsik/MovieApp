@@ -10,9 +10,11 @@ import com.example.movieapp.data.utills.state_models.setErrorString
 import com.example.movieapp.data.utills.state_models.setLoading
 import com.example.movieapp.data.utills.state_models.setSuccess
 import com.example.movieapp.domain.AddFavouriteUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class MovieDetailViewModel @Inject constructor(
     private val movieRepository: MovieRepository,
     private val addFavouriteUseCase: AddFavouriteUseCase
@@ -30,7 +32,7 @@ class MovieDetailViewModel @Inject constructor(
     }
 
 
-    fun getMovies(
+    fun getMovieDetailById(
         id: Int
     ) = viewModelScope.launch {
         movieDetailLiveData.setLoading()

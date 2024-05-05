@@ -1,8 +1,10 @@
 package com.example.movieapp.ui.planetList
 
 import android.app.Dialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.movieapp.R
@@ -10,10 +12,13 @@ import com.example.movieapp.data.utills.state_models.Resource
 import com.example.movieapp.data.utills.state_models.ResourceState
 import com.example.movieapp.databinding.ActivityMainBinding
 import com.example.movieapp.domain.model.Movie
+import com.example.movieapp.ui.Constants.BUNDLE_TRACK_ID
 import com.example.movieapp.ui.Constants.QUERY_VALUE_COUNTRY
 import com.example.movieapp.ui.Constants.QUERY_VALUE_MEDIA
 import com.example.movieapp.ui.Constants.QUERY_VALUE_TERM
 import com.example.movieapp.ui.adapter.MovieListRecycleAdapter
+import com.example.movieapp.ui.extentions.startActivity
+import com.example.movieapp.ui.planetDetail.MovieDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -55,7 +60,9 @@ class MainActivity : AppCompatActivity() {
     private fun setMovieLisRecycleView(movieList: List<Movie>) {
         movieList.let { moviesListResponse ->
             binding.recyclerviewMovieList.layoutManager = LinearLayoutManager(this@MainActivity)
-            val movieListRecycleAdapter = MovieListRecycleAdapter(moviesListResponse)
+            val movieListRecycleAdapter = MovieListRecycleAdapter(moviesListResponse) { trackId->
+                navigateToDetailMovieScreen(trackId)
+            }
             binding.recyclerviewMovieList.adapter = movieListRecycleAdapter
         }
     }
@@ -67,7 +74,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             ResourceState.SUCCESS -> {
-                hideProgressDialog()
                 resource.data?.let { movieList ->
                     handleMoviesListResponse(movieList = movieList)
                 }
@@ -85,26 +91,14 @@ class MainActivity : AppCompatActivity() {
         setMovieLisRecycleView(movieList)
     }
 
-    /*    private fun initProgressDialog() {
-            progressDialog = Dialog(this).apply {
-                this.setContentView(R.layout.progress_dialog)
-                this.setCancelable(false)
-                this.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            }
-        }*/
-
-    /**
-     * show Progress Dialog
-     */
-    fun showProgressDialog() {
-        progressDialog?.show()
+    private fun navigateToDetailMovieScreen(trackId: Int) {
+        startActivity<MovieDetailActivity> {
+            putExtra(BUNDLE_TRACK_ID, trackId)
+            Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }.also {
+            finish()
+        }
     }
 
 
-    /**
-     * hide Progress dialog
-     */
-    fun hideProgressDialog() {
-        progressDialog?.dismiss()
-    }
 }

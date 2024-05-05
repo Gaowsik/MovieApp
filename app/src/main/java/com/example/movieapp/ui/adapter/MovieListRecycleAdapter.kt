@@ -12,6 +12,7 @@ import com.example.movieapp.domain.model.Movie
 
 class MovieListRecycleAdapter(
     var movieList: List<Movie>,
+    var onItemClicked: (Int) -> Unit
 ) :
     RecyclerView.Adapter<MovieListRecycleAdapter.MoviesListViewHolder>() {
 
@@ -40,6 +41,10 @@ class MovieListRecycleAdapter(
 
         fun onBind(movie: Movie) {
             bindDataToUi(movie = movie)
+
+            itemView.setOnClickListener {
+                this@MovieListRecycleAdapter.onItemClicked.invoke(movie.trackId)
+            }
         }
 
         private fun bindDataToUi(movie: Movie) {
