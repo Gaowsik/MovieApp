@@ -1,6 +1,6 @@
 package com.example.movieapp.data.sources.local
 
-import com.example.movieapp.data.models.Movie
+import com.example.movieapp.domain.Movie
 import javax.inject.Inject
 
 class LocalDataSourceImpl @Inject constructor(private val moviesDao: MoviesDao) : LocalDataSource {

@@ -1,8 +1,10 @@
 package com.example.movieapp.data.models
 
+import com.example.movieapp.domain.Movie
 import com.google.gson.annotations.SerializedName
 
-data class Movie(
+data class MovieResponseData(
+
     @field:SerializedName("trackId")
     val trackId: Int,
 
@@ -19,8 +21,19 @@ data class Movie(
     val primaryGenreName: String,
 
     @field:SerializedName("longDescription")
-    val longDescription: String,
+    val longDescription: String
+) {
+    fun toMovie(): Movie {
+        return Movie(
+            trackId = trackId,
+            trackName = trackName,
+            artworkUrl100 = artworkUrl100,
+            primaryGenreName = primaryGenreName,
+            longDescription = longDescription,
+            trackPrice = trackPrice,
+            isFavourite = false
+        )
+    }
 
-    val isFavourite: Boolean = false
 
-)
+}

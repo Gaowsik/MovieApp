@@ -2,7 +2,7 @@ package com.example.movieapp.data.sources.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.movieapp.data.models.Movie
+import com.example.movieapp.domain.Movie
 
 @Entity(tableName = "Movies")
 data class MovieEntity(

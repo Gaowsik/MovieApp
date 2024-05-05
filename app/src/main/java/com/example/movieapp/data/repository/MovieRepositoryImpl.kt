@@ -1,11 +1,8 @@
 package com.example.movieapp.data.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.example.movieapp.data.models.Movie
+import com.example.movieapp.domain.Movie
 import com.example.movieapp.data.sources.local.LocalDataSource
 import com.example.movieapp.data.sources.remote.RemoteDataSource
-import com.example.movieapp.data.utills.state_models.Resource
-import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor(
@@ -19,7 +16,11 @@ class MovieRepositoryImpl @Inject constructor(
         localDataSource.getMovieById(movieId)
 
     override suspend fun refreshMovies() {
-        val movies = remoteDataSource.getMovies().results
+        val moviesResponse = remoteDataSource.getMovies()
+        val movies = moviesResponse.results
+            .map {
+                it.toMovie()
+            }
         localDataSource.setPlanets(movies)
     }
 

@@ -1,9 +1,6 @@
 package com.example.movieapp.data.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.example.movieapp.data.models.Movie
-import com.example.movieapp.data.utills.state_models.Resource
-import kotlinx.coroutines.flow.Flow
+import com.example.movieapp.domain.Movie
 
 interface MovieRepository {
     fun getMovies(): List<Movie>
