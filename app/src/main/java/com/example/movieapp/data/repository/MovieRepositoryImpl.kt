@@ -21,7 +21,7 @@ class MovieRepositoryImpl @Inject constructor(
             .map {
                 it.toMovie()
             }
-        localDataSource.setPlanets(movies)
+        localDataSource.setMovies(movies)
     }
 
     override suspend fun addFavouriteById(movieId: Int) =

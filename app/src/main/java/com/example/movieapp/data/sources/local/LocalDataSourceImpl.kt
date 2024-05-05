@@ -14,8 +14,8 @@ class LocalDataSourceImpl @Inject constructor(private val moviesDao: MoviesDao) 
         return moviesDao.observePlanetById(trackId).toMovie()
     }
 
-    override suspend fun setPlanets(planets: List<Movie>) {
-        moviesDao.setMovies(planets.map {
+    override suspend fun setMovies(movies: List<Movie>) {
+        moviesDao.setMovies(movies.map {
             it.toMovieEntity()
         })
     }
