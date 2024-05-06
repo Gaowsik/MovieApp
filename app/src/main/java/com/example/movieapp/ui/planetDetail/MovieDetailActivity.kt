@@ -12,7 +12,9 @@ import com.example.movieapp.databinding.ActivityMovieDetailBinding
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.ui.Constants.BUNDLE_TRACK_ID
 import com.example.movieapp.ui.planetList.MovieListViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MovieDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMovieDetailBinding
     private val movieDetailViewModel: MovieDetailViewModel by viewModels()

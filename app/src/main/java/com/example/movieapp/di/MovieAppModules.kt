@@ -1,6 +1,7 @@
 package com.example.movieapp.di
 
 import android.content.Context
+import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.example.movieapp.BuildConfig
 import com.example.movieapp.data.repository.MovieRepository
@@ -13,11 +14,13 @@ import com.example.movieapp.data.sources.remote.RemoteDataSource
 import com.example.movieapp.data.sources.remote.RemoteDataSourceImpl
 import com.example.movieapp.data.sources.remote.retrofit.createAppApiClient
 import com.example.movieapp.domain.AddFavouriteUseCase
+import com.example.movieapp.ui.planetDetail.MovieDetailViewModel
 import com.example.movieapp.ui.planetList.MovieListViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import retrofit2.Retrofit

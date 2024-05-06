@@ -95,8 +95,6 @@ class MainActivity : AppCompatActivity() {
         startActivity<MovieDetailActivity> {
             putExtra(BUNDLE_TRACK_ID, trackId)
             Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }.also {
-            finish()
         }
     }
 
