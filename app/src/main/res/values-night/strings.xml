@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="msg_type_to_search">type to search</string>
+    <string name="usd">\u00a0USD</string>
 </resources>

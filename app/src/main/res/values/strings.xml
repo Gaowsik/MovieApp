@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MovieApp</string>
     <string name="msg_type_to_search">type to search</string>
+    <string name="usd">\u00a0USD</string>
 </resources>
