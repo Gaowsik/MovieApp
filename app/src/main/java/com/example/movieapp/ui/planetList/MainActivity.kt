@@ -1,6 +1,7 @@
 package com.example.movieapp.ui.planetList
 
 import android.app.Dialog
+import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -38,19 +39,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
-
     }
 
     private fun init() {
         bindUi()
         setUpObservers()
         setUpListeners()
-        // initProgressDialog()
-        movieListViewModel.refreshMoviesList(
-            QUERY_VALUE_TERM, QUERY_VALUE_COUNTRY, QUERY_VALUE_MEDIA
-        )
-
-
     }
 
     private fun bindUi() {
@@ -68,7 +62,9 @@ class MainActivity : AppCompatActivity() {
             this
         ) { observeFilterMoviesListRequest(it) }
 
-
+        movieListViewModel.isRefreshedLiveData.observe(
+            this
+        ) { observeIsRefreshedMoviesListRequest(it) }
     }
 
     private fun setUpListeners() {
@@ -119,7 +115,15 @@ class MainActivity : AppCompatActivity() {
 
             ResourceState.SUCCESS -> {
                 resource.data?.let { movieList ->
-                    handleMoviesListResponse(movieList = movieList)
+                    if (movieList.isEmpty()) {
+                        getMovieListFromApi(
+                            QUERY_VALUE_TERM,
+                            QUERY_VALUE_COUNTRY,
+                            QUERY_VALUE_MEDIA
+                        )
+                    } else {
+                        handleMoviesListResponse(movieList = movieList)
+                    }
                 }
             }
 
@@ -145,7 +149,29 @@ class MainActivity : AppCompatActivity() {
             }
 
             ResourceState.ERROR -> {
-               showEmptyText()
+                showEmptyText()
+            }
+
+            else -> {}
+        }
+
+    }
+
+
+    private fun observeIsRefreshedMoviesListRequest(resource: Resource<Boolean>) {
+        when (resource?.state) {
+            ResourceState.LOADING -> {
+
+            }
+
+            ResourceState.SUCCESS -> {
+                resource.data?.let { it ->
+                    movieListViewModel.getMovies()
+                }
+            }
+
+            ResourceState.ERROR -> {
+                showEmptyText()
             }
 
             else -> {}
@@ -159,6 +185,10 @@ class MainActivity : AppCompatActivity() {
             (it as MovieListRecycleAdapter).updateFilteredList(filterList)
         }
 
+    }
+
+    private fun getMovieListFromApi(term: String, country: String, media: String) {
+        movieListViewModel.refreshMoviesList(term, country, media)
     }
 
     private fun handleMoviesListResponse(movieList: List<Movie>) {

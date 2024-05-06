@@ -1,6 +1,5 @@
 package com.example.movieapp.ui.planetList
 
-import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,6 +24,7 @@ class MovieListViewModel @Inject constructor(
 ) : ViewModel() {
     lateinit var myMoviesListLiveData: MutableLiveData<Resource<List<Movie>>>
     lateinit var filteredMoviesLiveData: MutableLiveData<Resource<List<Movie>>>
+    lateinit var isRefreshedLiveData: MutableLiveData<Resource<Boolean>>
     private val _internalMoviesListLiveData = MutableLiveData<Resource<List<Movie>>>()
 
 
@@ -35,6 +35,7 @@ class MovieListViewModel @Inject constructor(
     private fun initStateLiveData() {
         myMoviesListLiveData = MutableLiveData<Resource<List<Movie>>>()
         filteredMoviesLiveData = MutableLiveData<Resource<List<Movie>>>()
+        isRefreshedLiveData = MutableLiveData<Resource<Boolean>>()
     }
 
 
@@ -73,10 +74,18 @@ class MovieListViewModel @Inject constructor(
         if (updateTaxiStatusResult != 1) throw IllegalStateException("Failed to On Local!")
     }
 
-    fun refreshMoviesList(term: String, country: String, media: String) {
-        viewModelScope.launch {
-            movieRepository.refreshMovies(term, country, media)
 
+    fun refreshMoviesList(
+        term: String, country: String, media: String
+    ) = viewModelScope.launch {
+        isRefreshedLiveData.setLoading()
+        try {
+            movieRepository.refreshMovies(term, country, media)
+            isRefreshedLiveData.setSuccess(true)
+        } catch (e: Exception) {
+            isRefreshedLiveData.setErrorString((e.toString()))
+            e.printStackTrace()
+            return@launch
         }
     }
 
