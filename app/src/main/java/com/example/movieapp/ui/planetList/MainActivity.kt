@@ -1,11 +1,17 @@
 package com.example.movieapp.ui.planetList
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.movieapp.R
 import com.example.movieapp.data.utills.state_models.Resource
@@ -39,8 +45,7 @@ class MainActivity : AppCompatActivity() {
         movieListViewModel.refreshMoviesList(
             QUERY_VALUE_TERM, QUERY_VALUE_COUNTRY, QUERY_VALUE_MEDIA
         )
-        //  movieListViewModel.addFavouriteById(208510932)
-        movieListViewModel.getMovies()
+
 
     }
 
@@ -60,11 +65,23 @@ class MainActivity : AppCompatActivity() {
     private fun setMovieLisRecycleView(movieList: List<Movie>) {
         movieList.let { moviesListResponse ->
             binding.recyclerviewMovieList.layoutManager = LinearLayoutManager(this@MainActivity)
-            val movieListRecycleAdapter = MovieListRecycleAdapter(moviesListResponse) { trackId->
-                navigateToDetailMovieScreen(trackId)
-            }
+            val movieListRecycleAdapter =
+                MovieListRecycleAdapter(moviesListResponse, onFavouriteClicked = { trackId ->
+                    handleFavouriteItemClick(trackId)
+
+                }) { trackId ->
+                    handleItemClick(trackId)
+                }
             binding.recyclerviewMovieList.adapter = movieListRecycleAdapter
         }
+    }
+
+    private fun handleItemClick(trackId: Int) {
+        navigateToDetailMovieScreen(trackId)
+    }
+
+    private fun handleFavouriteItemClick(trackId: Int) {
+        makeMovieFavourite(trackId)
     }
 
     private fun observeGetMoviesListRequest(resource: Resource<List<Movie>>?) {
@@ -96,6 +113,15 @@ class MainActivity : AppCompatActivity() {
             putExtra(BUNDLE_TRACK_ID, trackId)
             Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
+    }
+
+    private fun makeMovieFavourite(id: Int) {
+        movieListViewModel.addFavouriteById(id)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        movieListViewModel.getMovies()
     }
 
 
