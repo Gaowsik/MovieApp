@@ -1,5 +1,6 @@
 package com.example.movieapp.ui.planetList
 
+import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +11,10 @@ import com.example.movieapp.data.utills.state_models.setErrorString
 import com.example.movieapp.data.utills.state_models.setLoading
 import com.example.movieapp.data.utills.state_models.setSuccess
 import com.example.movieapp.domain.AddFavouriteUseCase
+import com.example.movieapp.ui.Constants.ACTION_SEARCH_DELAY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,6 +24,9 @@ class MovieListViewModel @Inject constructor(
     private val addFavouriteUseCase: AddFavouriteUseCase
 ) : ViewModel() {
     lateinit var myMoviesListLiveData: MutableLiveData<Resource<List<Movie>>>
+    lateinit var filteredMoviesLiveData: MutableLiveData<Resource<List<Movie>>>
+    private val _internalMoviesListLiveData = MutableLiveData<Resource<List<Movie>>>()
+
 
     init {
         initStateLiveData()
@@ -27,6 +34,7 @@ class MovieListViewModel @Inject constructor(
 
     private fun initStateLiveData() {
         myMoviesListLiveData = MutableLiveData<Resource<List<Movie>>>()
+        filteredMoviesLiveData = MutableLiveData<Resource<List<Movie>>>()
     }
 
 
@@ -43,6 +51,22 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * this is created to get the latest db value
+     */
+    fun getLatestMovies(
+    ) = viewModelScope.launch {
+        _internalMoviesListLiveData.setLoading()
+        try {
+            val moviesList = movieRepository.getMovies()
+            _internalMoviesListLiveData.setSuccess(data = moviesList, message = null)
+        } catch (e: Exception) {
+            _internalMoviesListLiveData.setErrorString((e.toString()))
+            e.printStackTrace()
+            return@launch
+        }
+    }
+
     fun addFavouriteById(id: Int) = viewModelScope.launch {
         val updateTaxiStatusResult =
             addFavouriteUseCase(id)
@@ -53,6 +77,32 @@ class MovieListViewModel @Inject constructor(
         viewModelScope.launch {
             movieRepository.refreshMovies(term, country, media)
 
+        }
+    }
+
+    fun filterMovies(query: String) {
+        viewModelScope.launch {
+            delay(ACTION_SEARCH_DELAY)
+            filteredMoviesLiveData.setLoading()
+
+            val moviesJob = async { getLatestMovies() }
+            // Wait for the getMovies job to complete
+            moviesJob.await()
+            val currentList =
+                _internalMoviesListLiveData.value?.data ?: emptyList()
+            val filteredList = if (query.isBlank()) {
+                currentList
+            } else {
+                currentList.filter { movie ->
+                    movie.trackName.contains(query, true)
+                }
+            }
+
+            if (filteredList.isNotEmpty()) {
+                filteredMoviesLiveData.setSuccess(filteredList, message = null)
+            } else {
+                filteredMoviesLiveData.setErrorString("No results found")
+            }
         }
     }
 

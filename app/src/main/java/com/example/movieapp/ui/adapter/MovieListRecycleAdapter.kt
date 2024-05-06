@@ -23,6 +23,12 @@ class MovieListRecycleAdapter(
 ) :
     RecyclerView.Adapter<MovieListRecycleAdapter.MoviesListViewHolder>() {
 
+    // Update the movie list when filtering occurs
+    fun updateFilteredList(filteredMovies: List<Movie>) {
+        movieList = filteredMovies
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

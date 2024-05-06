@@ -7,7 +7,10 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private fun init() {
         bindUi()
         setUpObservers()
+        setUpListeners()
         // initProgressDialog()
         movieListViewModel.refreshMoviesList(
             QUERY_VALUE_TERM, QUERY_VALUE_COUNTRY, QUERY_VALUE_MEDIA
@@ -59,6 +63,29 @@ class MainActivity : AppCompatActivity() {
         movieListViewModel.myMoviesListLiveData.observe(
             this
         ) { observeGetMoviesListRequest(it) }
+
+        movieListViewModel.filteredMoviesLiveData.observe(
+            this
+        ) { observeFilterMoviesListRequest(it) }
+
+
+    }
+
+    private fun setUpListeners() {
+        binding.editSearchMovie.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not needed
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Call filter method in ViewModel when text changes
+                movieListViewModel.filterMovies(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Not needed
+            }
+        })
     }
 
 
@@ -104,6 +131,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeFilterMoviesListRequest(resource: Resource<List<Movie>>?) {
+
+        when (resource?.state) {
+            ResourceState.LOADING -> {
+
+            }
+
+            ResourceState.SUCCESS -> {
+                resource.data?.let { filterList ->
+                    handleMoviesFilterListResponse(filterList = filterList)
+                }
+            }
+
+            ResourceState.ERROR -> {
+               showEmptyText()
+            }
+
+            else -> {}
+        }
+
+    }
+
+    private fun handleMoviesFilterListResponse(filterList: List<Movie>) {
+        showRecyclerview()
+        binding.recyclerviewMovieList?.adapter?.let {
+            (it as MovieListRecycleAdapter).updateFilteredList(filterList)
+        }
+
+    }
+
     private fun handleMoviesListResponse(movieList: List<Movie>) {
         setMovieLisRecycleView(movieList)
     }
@@ -117,6 +174,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun makeMovieFavourite(id: Int) {
         movieListViewModel.addFavouriteById(id)
+    }
+
+    private fun showRecyclerview() {
+        binding.textEmpty.visibility = View.GONE
+        binding.recyclerviewMovieList.visibility = View.VISIBLE
+    }
+
+    private fun showEmptyText() {
+        binding.textEmpty.visibility = View.VISIBLE
+        binding.recyclerviewMovieList.visibility = View.GONE
     }
 
     override fun onResume() {
