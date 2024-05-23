@@ -11,6 +11,7 @@ import com.example.movieapp.data.utills.state_models.setLoading
 import com.example.movieapp.data.utills.state_models.setSuccess
 import com.example.movieapp.domain.AddFavouriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,14 +37,11 @@ class MovieDetailViewModel @Inject constructor(
         id: Int
     ) = viewModelScope.launch {
         movieDetailLiveData.setLoading()
-        try {
-            val moviesList = movieRepository.getMovieById(id)
-            movieDetailLiveData.setSuccess(data = moviesList, message = null)
-        } catch (e: Exception) {
-            movieDetailLiveData.setErrorString((e.toString()))
-            e.printStackTrace()
-            return@launch
-        }
+            movieRepository.getMovieById(id).catch {
+                movieDetailLiveData.setErrorString((it.message.toString()))
+            }.collect(){
+                movieDetailLiveData.setSuccess(data = it.data, message = null)
+            }
     }
 
     fun addFavouriteById(id: Int) = viewModelScope.launch {

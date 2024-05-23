@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.data.repository.MovieRepository
+import com.example.movieapp.data.utills.Status
+import com.example.movieapp.data.utills.WorkResult
 import com.example.movieapp.data.utills.state_models.Resource
 import com.example.movieapp.data.utills.state_models.setErrorString
 import com.example.movieapp.data.utills.state_models.setLoading
@@ -14,6 +16,7 @@ import com.example.movieapp.ui.Constants.ACTION_SEARCH_DELAY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,16 +42,17 @@ class MovieListViewModel @Inject constructor(
     }
 
 
-    fun getMovies(
-    ) = viewModelScope.launch {
+    fun getMovies() {
         myMoviesListLiveData.setLoading()
-        try {
-            val moviesList = movieRepository.getMovies()
-            myMoviesListLiveData.setSuccess(data = moviesList, message = null)
-        } catch (e: Exception) {
-            myMoviesListLiveData.setErrorString((e.toString()))
-            e.printStackTrace()
-            return@launch
+        viewModelScope.launch {
+
+            movieRepository.getMovies()
+                .catch {
+                    myMoviesListLiveData.setErrorString(it.message.toString())
+                }
+                .collect {
+                    myMoviesListLiveData.setSuccess(it.data)
+                }
         }
     }
 
@@ -58,14 +62,13 @@ class MovieListViewModel @Inject constructor(
     fun getLatestMovies(
     ) = viewModelScope.launch {
         _internalMoviesListLiveData.setLoading()
-        try {
-            val moviesList = movieRepository.getMovies()
-            _internalMoviesListLiveData.setSuccess(data = moviesList, message = null)
-        } catch (e: Exception) {
-            _internalMoviesListLiveData.setErrorString((e.toString()))
-            e.printStackTrace()
-            return@launch
-        }
+        movieRepository.getMovies()
+            .catch {
+                _internalMoviesListLiveData.setErrorString(it.message.toString())
+            }
+            .collect {
+                _internalMoviesListLiveData.setSuccess(it.data)
+            }
     }
 
     fun addFavouriteById(id: Int) = viewModelScope.launch {
