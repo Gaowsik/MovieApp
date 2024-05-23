@@ -1,13 +1,13 @@
 package com.example.movieapp.data.utills
 
-/*sealed class WorkResult<out R> {
+sealed class WorkResult<out R> {
     data class Success<out T>(val data: T) : WorkResult<T>()
     data class Error(val exception: Exception) : WorkResult<Nothing>()
     object Loading : WorkResult<Nothing>()
-}*/
+}
 
 
-enum class Status {
+/*enum class Status {
     SUCCESS,
     ERROR,
     LOADING
@@ -24,4 +24,4 @@ data class WorkResult<out T>(val status: Status, val data: T?, val message: Stri
             return WorkResult(Status.LOADING, null, null)
         }
     }
-}
+}*/

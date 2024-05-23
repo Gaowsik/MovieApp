@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.data.repository.MovieRepository
+import com.example.movieapp.data.utills.WorkResult
 import com.example.movieapp.data.utills.state_models.Resource
 import com.example.movieapp.data.utills.state_models.setErrorString
 import com.example.movieapp.data.utills.state_models.setLoading
@@ -40,7 +41,9 @@ class MovieDetailViewModel @Inject constructor(
             movieRepository.getMovieById(id).catch {
                 movieDetailLiveData.setErrorString((it.message.toString()))
             }.collect(){
-                movieDetailLiveData.setSuccess(data = it.data, message = null)
+                if(it is WorkResult.Success){
+                    movieDetailLiveData.setSuccess(data =it.data, message = null)
+                }
             }
     }
 

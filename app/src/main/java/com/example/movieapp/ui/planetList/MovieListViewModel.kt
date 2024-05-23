@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.data.repository.MovieRepository
-import com.example.movieapp.data.utills.Status
 import com.example.movieapp.data.utills.WorkResult
 import com.example.movieapp.data.utills.state_models.Resource
 import com.example.movieapp.data.utills.state_models.setErrorString
@@ -51,7 +50,9 @@ class MovieListViewModel @Inject constructor(
                     myMoviesListLiveData.setErrorString(it.message.toString())
                 }
                 .collect {
-                    myMoviesListLiveData.setSuccess(it.data)
+                    if (it is WorkResult.Success) {
+                        myMoviesListLiveData.setSuccess(it.data)
+                    }
                 }
         }
     }
@@ -67,7 +68,10 @@ class MovieListViewModel @Inject constructor(
                 _internalMoviesListLiveData.setErrorString(it.message.toString())
             }
             .collect {
-                _internalMoviesListLiveData.setSuccess(it.data)
+                if (it is WorkResult.Success) {
+                    _internalMoviesListLiveData.setSuccess(it.data)
+                }
+
             }
     }
 
