@@ -12,10 +12,14 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.movieapp.R
 import com.example.movieapp.data.utills.state_models.Resource
@@ -30,6 +34,8 @@ import com.example.movieapp.ui.adapter.MovieListRecycleAdapter
 import com.example.movieapp.ui.extentions.startActivity
 import com.example.movieapp.ui.planetDetail.MovieDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -39,6 +45,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
+
+        lifecycleScope.launch {
+            // repeatOnLifecycle launches the block in a new coroutine every time the
+            // lifecycle is in the STARTED state (or above) and cancels it when it's STOPPED.
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Trigger the flow and start listening for values.
+                // Note that this happens when lifecycle is STARTED and stops
+                // collecting when the lifecycle is STOPPED
+                movieListViewModel.settingsUiState.collectLatest { uiState ->
+                    // New value received
+                    observeGetMoviesStateFlow(uiState)
+                }
+            }
+        }
     }
 
     private fun init() {
@@ -54,9 +74,9 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setUpObservers() {
-        movieListViewModel.myMoviesListLiveData.observe(
+/*        movieListViewModel.myMoviesListLiveData.observe(
             this
-        ) { observeGetMoviesListRequest(it) }
+        ) { observeGetMoviesListRequest(it) }*/
 
         movieListViewModel.filteredMoviesLiveData.observe(
             this
@@ -128,12 +148,34 @@ class MainActivity : AppCompatActivity() {
             }
 
             ResourceState.ERROR -> {
-
             }
 
             else -> {}
         }
     }
+
+    private fun observeGetMoviesStateFlow(uiState: MovieListViewModel.MainActivityUiState) {
+
+        when(uiState){
+            is MovieListViewModel.MainActivityUiState.Error -> { Toast.makeText(this,"Error",Toast.LENGTH_LONG).show()
+            }
+            is MovieListViewModel.MainActivityUiState.Loading -> Toast.makeText(this,"loading",Toast.LENGTH_SHORT).show()
+            is MovieListViewModel.MainActivityUiState.Success -> {
+                uiState.listMovies?.let { movieList ->
+                    if (movieList.isEmpty()) {
+                        getMovieListFromApi(
+                            QUERY_VALUE_TERM,
+                            QUERY_VALUE_COUNTRY,
+                            QUERY_VALUE_MEDIA
+                        )
+                    } else {
+                        handleMoviesListResponse(movieList = movieList)
+                    }
+                }
+            }
+            }
+        }
+
 
     private fun observeFilterMoviesListRequest(resource: Resource<List<Movie>>?) {
 
@@ -166,7 +208,7 @@ class MainActivity : AppCompatActivity() {
 
             ResourceState.SUCCESS -> {
                 resource.data?.let { it ->
-                    movieListViewModel.getMovies()
+                 //   movieListViewModel.getMovies()
                 }
             }
 
@@ -218,8 +260,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        movieListViewModel.getMovies()
     }
 
 
 }
+
+

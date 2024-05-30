@@ -5,7 +5,7 @@ import com.example.movieapp.domain.model.Movie
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
-    suspend fun getMovies(): Flow<WorkResult<List<Movie>>>
+     fun getMovies(): Flow<WorkResult<List<Movie>>>
     suspend fun getMovieById(movieId: Int): Flow<WorkResult<Movie>>
     suspend fun refreshMovies(term : String, country : String, media : String)
     suspend fun addFavouriteById(movieId: Int) : Int

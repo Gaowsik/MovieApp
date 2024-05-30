@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class LocalDataSourceImpl @Inject constructor(private val moviesDao: MoviesDao) : LocalDataSource {
-    override suspend fun getMovies(): Flow<WorkResult<List<Movie>>> {
+    override fun getMovies(): Flow<WorkResult<List<Movie>>> {
 
         return moviesDao.getMovies().map {
             WorkResult.Success(it.map { movieEntity -> movieEntity.toMovie()  })

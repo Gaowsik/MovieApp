@@ -11,7 +11,7 @@ class MovieRepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val remoteDataSource: RemoteDataSource
 ) : MovieRepository {
-    override suspend fun getMovies(): Flow<WorkResult<List<Movie>>> = localDataSource.getMovies()
+    override  fun getMovies(): Flow<WorkResult<List<Movie>>> = localDataSource.getMovies()
 
 
     override suspend fun getMovieById(movieId: Int): Flow<WorkResult<Movie>> =

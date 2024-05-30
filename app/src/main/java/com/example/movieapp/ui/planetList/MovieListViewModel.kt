@@ -15,9 +15,17 @@ import com.example.movieapp.ui.Constants.ACTION_SEARCH_DELAY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class MovieListViewModel @Inject constructor(
@@ -41,7 +49,7 @@ class MovieListViewModel @Inject constructor(
     }
 
 
-    fun getMovies() {
+/*    fun getMovies() {
         myMoviesListLiveData.setLoading()
         viewModelScope.launch {
 
@@ -55,7 +63,26 @@ class MovieListViewModel @Inject constructor(
                     }
                 }
         }
-    }
+    }*/
+
+
+    val settingsUiState: StateFlow<MainActivityUiState> =
+        movieRepository.getMovies()
+            .catch {
+                MainActivityUiState.Error(it)
+            }
+            .map { result ->
+                when (result) {
+                    is WorkResult.Success -> MainActivityUiState.Success(result.data)
+                    is WorkResult.Error -> MainActivityUiState.Error(result.exception)
+                    is WorkResult.Loading -> MainActivityUiState.Loading(true)
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5.seconds.inWholeMilliseconds),
+                initialValue = MainActivityUiState.Loading(true),
+            )
 
     /**
      * this is created to get the latest db value
@@ -120,6 +147,12 @@ class MovieListViewModel @Inject constructor(
                 filteredMoviesLiveData.setErrorString("No results found")
             }
         }
+    }
+
+    sealed interface MainActivityUiState {
+         data class Loading(val isLoading : Boolean) : MainActivityUiState
+        data class Success(val listMovies: List<Movie>) : MainActivityUiState
+        data class Error(val exception: Throwable): MainActivityUiState
     }
 
 
